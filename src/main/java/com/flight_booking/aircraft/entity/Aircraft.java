@@ -1,5 +1,6 @@
 package com.flight_booking.aircraft.entity;
 
+import com.flight_booking.airline.entity.Airline;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,11 +12,17 @@ public class Aircraft {
     private Long id;
 
     private String model;
-    private String capacity;
+    private int capacity;
     private String status;
 
     @ManyToOne
-    private Airline airlineId;
+    private Airline airline;
+
+    public Aircraft(String model, int capacity, String status) {
+        this.model = model;
+        this.capacity = capacity;
+        this.status = status;
+    }
 
     public Long getId() {
         return id;
@@ -33,11 +40,11 @@ public class Aircraft {
         this.model = model;
     }
 
-    public String getCapacity() {
+    public int getCapacity() {
         return capacity;
     }
 
-    public void setCapacity(String capacity) {
+    public void setCapacity(int capacity) {
         this.capacity = capacity;
     }
 
@@ -49,11 +56,11 @@ public class Aircraft {
         this.status = status;
     }
 
-    public Airline getAirlineId() {
-        return airlineId;
+    public Airline getAirline() {
+        return airline;
     }
 
-    public void setAirlineId(Airline airlineId) {
-        this.airlineId = airlineId;
+    public void setAirline(Airline airline) {
+        this.airline = airline;
     }
 }
