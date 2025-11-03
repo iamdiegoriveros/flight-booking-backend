@@ -1,6 +1,8 @@
 package com.flight_booking.airline.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
 
 @Entity
 @Table(name = "airlines")
@@ -10,8 +12,14 @@ public class Airline {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank()
     private String name;
     private String code;
+
+    public Airline(String name, String code) {
+        this.name = name;
+        this.code = code;
+    }
 
     public Long getId() {
         return id;
