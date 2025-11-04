@@ -4,6 +4,7 @@ import com.flight_booking.aircraft.entity.Aircraft;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 @Entity
@@ -16,7 +17,6 @@ public class Flight {
 
     private String origin;
     private String destination;
-    private Date date;
     private LocalDateTime dateTimeDeparture;
     private LocalDateTime dateTimeArrival;
     private String status;
@@ -28,13 +28,16 @@ public class Flight {
     public Flight() {
     }
 
-    public Flight(String origin, String destination, Date date, LocalDateTime dateTimeDeparture, LocalDateTime dateTimeArrival, String status) {
+    public Flight(String origin, String destination, LocalDateTime dateTimeDeparture, LocalDateTime dateTimeArrival) {
         this.origin = origin;
         this.destination = destination;
-        this.date = date;
         this.dateTimeDeparture = dateTimeDeparture;
         this.dateTimeArrival = dateTimeArrival;
-        this.status = status;
+    }
+
+    @PrePersist
+    public void prePersist() {
+        this.status = "PROGRAMMED";
     }
 
     public Long getId() {
@@ -59,14 +62,6 @@ public class Flight {
 
     public void setDestination(String destination) {
         this.destination = destination;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     public LocalDateTime getDateTimeDeparture() {
@@ -99,6 +94,18 @@ public class Flight {
 
     public void setAircraft(Aircraft aircraft) {
         this.aircraft = aircraft;
+    }
+
+    public String formatterDateTimeDeparture() {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return this.dateTimeDeparture.format(format);
+    }
+
+    public String formatterDateTimeArrival() {
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        return this.dateTimeArrival.format(format);
     }
 }
 
