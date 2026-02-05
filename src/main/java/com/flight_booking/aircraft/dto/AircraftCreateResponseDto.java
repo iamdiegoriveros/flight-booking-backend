@@ -1,11 +1,14 @@
 package com.flight_booking.aircraft.dto;
 
+import com.flight_booking.airline.dto.AirlineCreateResponseDto;
+
 public class AircraftCreateResponseDto {
 
     private Long id;
     private String model;
     private int capacity;
     private String status;
+    private AirlineCreateResponseDto airline;
 
     public String getModel() {
         return model;
@@ -33,5 +36,17 @@ public class AircraftCreateResponseDto {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public AirlineCreateResponseDto getAirline() {
+        return airline;
+    }
+
+    public void setAirline(AirlineCreateResponseDto airline) {
+        this.airline = airline;
     }
 }
