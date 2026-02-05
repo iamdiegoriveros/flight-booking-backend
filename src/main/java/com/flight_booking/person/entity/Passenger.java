@@ -1,5 +1,6 @@
 package com.flight_booking.person.entity;
 
+import com.flight_booking.booking.entity.Booking;
 import com.flight_booking.user.entity.User;
 import jakarta.persistence.*;
 
@@ -12,9 +13,9 @@ public class Passenger extends Person{
     @OneToMany(mappedBy = "passenger")
     private List<Booking> bookings;
 
-    @OneToOne
-    @Column(name = "user_id")
-    private User user;
+//    @OneToOne
+//    @Column(name = "user_id")
+//    private User user;
 
     public List<Booking> getBookings() {
         return bookings;
@@ -24,11 +25,11 @@ public class Passenger extends Person{
         this.bookings = bookings;
     }
 
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 }
