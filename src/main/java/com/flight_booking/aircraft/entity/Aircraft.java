@@ -18,6 +18,9 @@ public class Aircraft {
     @ManyToOne
     private Airline airline;
 
+    public Aircraft() {
+    }
+
     public Aircraft(String model, int capacity, String status) {
         this.model = model;
         this.capacity = capacity;
