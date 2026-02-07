@@ -4,6 +4,7 @@ import com.flight_booking.aircraft.dto.AircraftCreateResponseDto;
 import com.flight_booking.aircraft.entity.Aircraft;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class FlightCreateResponseDto {
 
@@ -14,6 +15,7 @@ public class FlightCreateResponseDto {
     private LocalDateTime dateTimeArrival;
     private String status;
     private AircraftCreateResponseDto aircraft;
+    private List<FlightFareResponseDto> flightFare;
 
     public Long getId() {
         return id;
@@ -69,5 +71,13 @@ public class FlightCreateResponseDto {
 
     public void setAircraft(AircraftCreateResponseDto aircraft) {
         this.aircraft = aircraft;
+    }
+
+    public List<FlightFareResponseDto> getFlightFare() {
+        return flightFare;
+    }
+
+    public void setFlightFare(List<FlightFareResponseDto> flightFare) {
+        this.flightFare = flightFare;
     }
 }

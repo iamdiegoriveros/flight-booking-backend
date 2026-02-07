@@ -1,6 +1,7 @@
 package com.flight_booking.flight.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class FlightCreateRequestDto {
 
@@ -10,6 +11,7 @@ public class FlightCreateRequestDto {
     private LocalDateTime dateTimeArrival;
     private String status;
     private Long aircraftId;
+    private List<FlightFareRequestDto> flightFare;
 
     public String getOrigin() {
         return origin;
@@ -57,5 +59,13 @@ public class FlightCreateRequestDto {
 
     public void setAircraftId(Long aircraftId) {
         this.aircraftId = aircraftId;
+    }
+
+    public List<FlightFareRequestDto> getFlightFare() {
+        return flightFare;
+    }
+
+    public void setFlightFare(List<FlightFareRequestDto> flightFare) {
+        this.flightFare = flightFare;
     }
 }
