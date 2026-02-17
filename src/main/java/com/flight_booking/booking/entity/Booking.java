@@ -1,10 +1,12 @@
 package com.flight_booking.booking.entity;
 
-import com.flight_booking.flight.entity.Flight;
-import com.flight_booking.person.entity.Passenger;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bookings")
@@ -14,33 +16,32 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String classType;
-    private int seatNumber;
-    private LocalDate date;
-    private Float price;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updateAt;
+    private BigDecimal totalPrice;
+    private String currency;
     private String status;
 
-    @ManyToOne
-    @JoinColumn(name = "passenger_id")
-    private Passenger passenger;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Ticket> tickets;
 
-    @ManyToOne
-    @JoinColumn(name = "flight_id")
-    private Flight flight;
+    //    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
+//    @ManyToOne
+//    @JoinColumn(name = "flight_id")
+//    private Flight flight;
+
 
     public Booking() {
-    }
-
-    public Booking(String classType, int seatNumber, Float price, String status) {
-        this.classType = classType;
-        this.seatNumber = seatNumber;
-        this.price = price;
-        this.status = status;
+        this.tickets = new ArrayList<>();
     }
 
     @PrePersist
     public void prePersist() {
-        this.date = LocalDate.now();
+        this.createdAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -51,36 +52,36 @@ public class Booking {
         this.id = id;
     }
 
-    public String getClassType() {
-        return classType;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setClassType(String classType) {
-        this.classType = classType;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public int getSeatNumber() {
-        return seatNumber;
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
     }
 
-    public void setSeatNumber(int seatNumber) {
-        this.seatNumber = seatNumber;
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
     }
 
-    public LocalDate getDate() {
-        return date;
+    public BigDecimal getTotalPrice() {
+        return totalPrice;
     }
 
-    public void setDate(LocalDate date) {
-        this.date = date;
+    public void setTotalPrice(BigDecimal totalPrice) {
+        this.totalPrice = totalPrice;
     }
 
-    public Float getPrice() {
-        return price;
+    public String getCurrency() {
+        return currency;
     }
 
-    public void setPrice(Float price) {
-        this.price = price;
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String getStatus() {
@@ -91,19 +92,16 @@ public class Booking {
         this.status = status;
     }
 
-    public Passenger getPassenger() {
-        return passenger;
+    public List<Ticket> getTickets() {
+        return tickets;
     }
 
-    public void setPassenger(Passenger passenger) {
-        this.passenger = passenger;
+    public void setTickets(List<Ticket> tickets) {
+        this.tickets = tickets;
     }
 
-    public Flight getFlight() {
-        return flight;
-    }
-
-    public void setFlight(Flight flight) {
-        this.flight = flight;
+    public void addTickets(List<Ticket> ticketsList) {
+        ticketsList.forEach(ticket -> ticket.setBooking(this));
+        this.tickets.addAll(ticketsList);
     }
 }

@@ -1,7 +1,6 @@
-package com.flight_booking.person.entity;
+package com.flight_booking.passenger.entity;
 
 import jakarta.persistence.*;
-import org.springframework.context.annotation.Configuration;
 
 @Entity
 @Table(name = "Persons")

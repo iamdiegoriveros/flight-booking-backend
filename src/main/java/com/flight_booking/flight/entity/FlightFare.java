@@ -2,6 +2,8 @@ package com.flight_booking.flight.entity;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "flight_fares")
 public class FlightFare {
@@ -11,7 +13,7 @@ public class FlightFare {
     private Long id;
 
     private String travelClass;
-    private float basePrice;
+    private BigDecimal basePrice;
     private String currency;
 
     @ManyToOne
@@ -34,11 +36,11 @@ public class FlightFare {
         this.travelClass = travelClass;
     }
 
-    public float getBasePrice() {
+    public BigDecimal getBasePrice() {
         return basePrice;
     }
 
-    public void setBasePrice(float basePrice) {
+    public void setBasePrice(BigDecimal basePrice) {
         this.basePrice = basePrice;
     }
 
