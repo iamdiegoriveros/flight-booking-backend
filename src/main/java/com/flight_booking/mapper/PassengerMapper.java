@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
 public interface PassengerMapper {
 
     Passenger toEntity(PassengerCreateRequestDto dto);
-    PassengerCreateResponseDto toDto(PassengerMapper entity);
+    PassengerCreateResponseDto toDto(Passenger entity);
 }

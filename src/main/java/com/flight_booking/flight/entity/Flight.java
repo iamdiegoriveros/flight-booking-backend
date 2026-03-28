@@ -107,5 +107,9 @@ public class Flight {
 
         return this.dateTimeArrival.format(format);
     }
+
+    public boolean seatAvailable() {
+        return this.aircraft.getCapacity() > 0;
+    }
 }
 

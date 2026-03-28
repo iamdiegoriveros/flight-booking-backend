@@ -1,7 +1,6 @@
 package com.flight_booking.booking.dto;
 
-import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
-import com.flight_booking.passenger.entity.Passenger;
+import com.flight_booking.ticket.dto.TicketCreateRequestDto;
 
 import java.util.List;
 

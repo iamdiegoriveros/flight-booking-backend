@@ -1,12 +1,12 @@
 package com.flight_booking.booking.entity;
 
+import com.flight_booking.ticket.entity.Ticket;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "bookings")

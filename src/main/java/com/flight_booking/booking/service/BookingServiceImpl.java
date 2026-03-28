@@ -2,49 +2,50 @@ package com.flight_booking.booking.service;
 
 import com.flight_booking.booking.dto.*;
 import com.flight_booking.booking.entity.Booking;
-import com.flight_booking.booking.entity.Ticket;
+import com.flight_booking.exceptions.NoSeatAvailableException;
+import com.flight_booking.flight.service.FlightFareService;
+import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
+import com.flight_booking.passenger.service.PassengerService;
+import com.flight_booking.ticket.dto.TicketBuildResult;
+import com.flight_booking.ticket.dto.TicketCreateRequestDto;
+import com.flight_booking.ticket.dto.TicketCreateResponseDto;
+import com.flight_booking.ticket.entity.Ticket;
 import com.flight_booking.booking.repository.BookingRepository;
-import com.flight_booking.booking.repository.TicketRepository;
 import com.flight_booking.exceptions.BadRequestException;
 import com.flight_booking.exceptions.ResourceNotFoundException;
-import com.flight_booking.flight.dto.FlightSummaryBookingDto;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.entity.FlightFare;
-import com.flight_booking.flight.repository.FlightFareRepository;
 import com.flight_booking.flight.repository.FlightRepository;
 import com.flight_booking.mapper.BookingMapper;
 import com.flight_booking.mapper.FlightMapper;
 import com.flight_booking.mapper.TicketMapper;
-import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 import com.flight_booking.passenger.entity.Passenger;
-import com.flight_booking.passenger.repository.PassengerRepository;
+import com.flight_booking.ticket.service.TicketBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class BookingServiceImpl implements BookingService{
 
+    private final PassengerService passengerService;
+    private final FlightFareService flightFareService;
+
+    private final TicketBuilder ticketBuilder;
+
     private final BookingRepository bookingRepository;
-    private final TicketRepository ticketRepository;
-    private final PassengerRepository passengerRepository;
-    private final FlightFareRepository flightFareRepository;
     private final FlightRepository flightRepository;
 
     private final FlightMapper flightMapper;
     private final TicketMapper ticketMapper;
     private final BookingMapper bookingMapper;
 
-    public BookingServiceImpl(BookingRepository bookingRepository, TicketRepository ticketRepository, PassengerRepository passengerRepository, FlightFareRepository flightFareRepository, FlightRepository flightRepository, FlightMapper flightMapper, TicketMapper ticketMapper, BookingMapper bookingMapper) {
+    public BookingServiceImpl(PassengerService passengerService, FlightFareService flightFareService, TicketBuilder ticketBuilder, BookingRepository bookingRepository, FlightRepository flightRepository, FlightMapper flightMapper, TicketMapper ticketMapper, BookingMapper bookingMapper) {
+        this.passengerService = passengerService;
+        this.flightFareService = flightFareService;
+        this.ticketBuilder = ticketBuilder;
         this.bookingRepository = bookingRepository;
-        this.ticketRepository = ticketRepository;
-        this.passengerRepository = passengerRepository;
-        this.flightFareRepository = flightFareRepository;
         this.flightRepository = flightRepository;
         this.flightMapper = flightMapper;
         this.ticketMapper = ticketMapper;
@@ -56,82 +57,35 @@ public class BookingServiceImpl implements BookingService{
     public BookingCreateResponseDto create(BookingCreateRequestDto requestDto) {
 
         // get flight
-        FlightSummaryBookingDto flightSummaryBookingDto = flightRepository.flightSummaryByIdBooking(requestDto.getFlightId())
+        Flight flight = flightRepository.findById(requestDto.getFlightId())
                 .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id " + requestDto.getFlightId()));
-        Flight flightRef = flightRepository.getReferenceById(requestDto.getFlightId());
+
+        if (!flight.seatAvailable()) {
+            throw new NoSeatAvailableException("No seat available flight: " + flight.getId());
+        }
 
         // load fares
-        Map<String, FlightFare> fareMap = loadFlightFareMap(requestDto);
+        Map<String, FlightFare> fareMap = flightFareService.getFlightFareMap(requestDto.getFlightId());
 
         // validate dnis
         Set<String> dnis = validateUniqueDni(requestDto);
 
         // get dnis existentes
-        Map<String,Passenger> passengersInBD = passengerRepository.findByDniIn(new ArrayList<>(dnis)).stream()
-                .collect(Collectors.toMap(Passenger::getDni, passenger -> passenger));
+        Map<String,Passenger> passengersInBD = passengerService.getExistingPassengerByDni(dnis);
 
-        // build new tickets and new passengers
-        TicketBuildResult ticketBuildResult = buildTickets(requestDto, fareMap, passengersInBD, flightRef);
+        List<Passenger> newPassengers = buildNewPassengersEntity(requestDto.getTickets(), passengersInBD);
+        Map<String, Passenger> savedNewPassenger = passengerService.saveAllMap(newPassengers);
+
+        Map<String, Passenger> allPassengerInDb = new HashMap<>(passengersInBD);
+        allPassengerInDb.putAll(savedNewPassenger);
+
+        TicketBuildResult ticketBuildResult =  ticketBuilder.build(requestDto.getTickets(),flight,fareMap,allPassengerInDb);
 
         // create booking in DataBase
-        Booking bookingDB = createBooking(ticketBuildResult);
+        Booking bookingDB = saveBooking(ticketBuildResult);
 
 
-        return buildBookingResponse(bookingDB, bookingDB.getTickets(), flightSummaryBookingDto);
-
-    }
-
-    private TicketBuildResult buildTickets(
-            BookingCreateRequestDto requestDto,
-            Map<String, FlightFare> fareMap,
-            Map<String, Passenger> passengersInDB,
-            Flight flightRef) {
-
-        Map<String,Passenger> newPassengers = new HashMap<>();
-        Map<String,Ticket> ticketsNewPassenger = new HashMap<>();
-        List<Ticket> ticketsExistsPassenger = new ArrayList<>();
-        BigDecimal totalPrice = BigDecimal.ZERO;
-
-        // construir tickets y passenger
-        for (TicketCreateRequestDto ticketDto: requestDto.getTickets()) {
-
-            FlightFare flightFare = Optional.ofNullable(fareMap.get(ticketDto.getTravelClass()))
-                    .orElseThrow(() -> new ResourceNotFoundException("Fare not found with travel class " + ticketDto.getTravelClass()));
-
-            totalPrice = totalPrice.add(flightFare.getBasePrice());
-
-            Ticket ticket = buildTicketEntity(flightFare, flightRef);
-
-            // create passenger
-            Passenger passenger = passengersInDB.get(ticketDto.getPassengerCreateRequestDto().getDni());
-            if (passenger == null) {
-                passenger = buildPassengerEntity(ticketDto);
-
-                newPassengers.put(ticketDto.getPassengerCreateRequestDto().getDni(),passenger);
-                ticketsNewPassenger.put(ticketDto.getPassengerCreateRequestDto().getDni(), ticket);
-            } else {
-                ticket.setPassenger(passengersInDB.get(ticketDto.getPassengerCreateRequestDto().getDni()));
-                ticketsExistsPassenger.add(ticket);
-            }
-        }
-
-        List<Passenger> passengersDB = passengerRepository.saveAll(newPassengers.values());
-
-        // set passenger to ticket
-        passengersDB.forEach(passenger -> {
-            if (ticketsNewPassenger.containsKey(passenger.getDni())) {
-                Ticket ticket = ticketsNewPassenger.get(passenger.getDni());
-                ticket.setPassenger(passenger);
-            }
-        });
-
-        List<Ticket> allTickets = Stream
-                .concat(
-                        ticketsExistsPassenger.stream(),
-                        ticketsNewPassenger.values().stream())
-                .collect(Collectors.toList());
-
-        return new TicketBuildResult(allTickets, totalPrice);
+        return buildBookingResponse(bookingDB, bookingDB.getTickets(), flight.getId());
     }
 
     private Set<String> validateUniqueDni(BookingCreateRequestDto requestDto) {
@@ -148,59 +102,48 @@ public class BookingServiceImpl implements BookingService{
         return dnisU;
     }
 
-    private Map<String, FlightFare> loadFlightFareMap(BookingCreateRequestDto requestDto) {
+    private List<Passenger> buildNewPassengersEntity(List<TicketCreateRequestDto> ticketsDto, Map<String, Passenger> passengerInDbMap){
 
-        List<FlightFare> flightFaresList = flightFareRepository.findByFlightId(requestDto.getFlightId());
+        List<Passenger> passengers = new ArrayList<>();
 
-        if (flightFaresList.isEmpty()) throw new ResourceNotFoundException("Fares not found for flight with id: " + requestDto.getFlightId());
-
-        Map<String, FlightFare> fareMap = flightFaresList.stream()
-                .collect(Collectors.toMap(FlightFare::getTravelClass, fare -> fare));
-
-        return fareMap;
+        for (TicketCreateRequestDto ticketDto:ticketsDto) {
+            if (!passengerInDbMap.containsKey(ticketDto.getPassengerCreateRequestDto().getDni())) {
+                Passenger passenger = buildPassengerEntity(ticketDto.getPassengerCreateRequestDto());
+                passengers.add(passenger);
+            }
+        }
+        return passengers;
     }
 
-    private Ticket buildTicketEntity(FlightFare flightFare, Flight flightRef) {
-        Ticket ticket = new Ticket();
-        ticket.setTravelClass(flightFare.getTravelClass());
-        ticket.setPrice(flightFare.getBasePrice());
-        ticket.setFlight(flightRef);
-        ticket.setCurrency(flightFare.getCurrency());
-        ticket.setStatus("RESERVED");
-        ticket.setSeatCode(null);
-
-        return ticket;
-    }
-
-    private Passenger buildPassengerEntity(TicketCreateRequestDto ticketDto) {
+    private Passenger buildPassengerEntity(PassengerCreateRequestDto passengerDto) {
         Passenger passenger = new Passenger();
-        passenger.setFirstName(ticketDto.getPassengerCreateRequestDto().getFirstName());
-        passenger.setLastName(ticketDto.getPassengerCreateRequestDto().getLastName());
-        passenger.setDni(ticketDto.getPassengerCreateRequestDto().getDni());
+        passenger.setFirstName(passengerDto.getFirstName());
+        passenger.setLastName(passengerDto.getLastName());
+        passenger.setDni(passengerDto.getDni());
 
         return passenger;
     }
 
-    private Booking createBooking(TicketBuildResult ticketBuildResult) {
+    private Booking saveBooking(TicketBuildResult ticketBuildResult) {
+
         Booking booking = new Booking();
         booking.setCurrency("USD");
         booking.setTotalPrice(ticketBuildResult.getTotalPrice());
         booking.setStatus("RESERVED");
         booking.addTickets(ticketBuildResult.getAllTickets());
         return bookingRepository.save(booking);
-
     }
 
     private BookingCreateResponseDto buildBookingResponse(
             Booking bookingDB,
             List<Ticket> ticketsDB,
-            FlightSummaryBookingDto flightSummary) {
+            Long flightId) {
 
         List<TicketCreateResponseDto> ticketsCreateResponseDto = new ArrayList<>();
 
         for (Ticket ticket:ticketsDB) {
             TicketCreateResponseDto ticketDto = ticketMapper.toDto(ticket);
-            ticketDto.setFlight(flightSummary);
+            ticketDto.setFlightId(flightId);
             ticketsCreateResponseDto.add(ticketDto);
         }
 
@@ -211,7 +154,7 @@ public class BookingServiceImpl implements BookingService{
         bookingCreateResponseDto.setTotalPrice(bookingDB.getTotalPrice());
         bookingCreateResponseDto.setCurrency(bookingDB.getCurrency());
         bookingCreateResponseDto.setStatus("RESERVED");
-        bookingCreateResponseDto.setFlight(flightSummary);
+        bookingCreateResponseDto.setFlightId(flightId);
         bookingCreateResponseDto.setTickets(ticketsCreateResponseDto);
 
         return bookingCreateResponseDto;

@@ -1,5 +1,6 @@
-package com.flight_booking.booking.entity;
+package com.flight_booking.ticket.entity;
 
+import com.flight_booking.booking.entity.Booking;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.passenger.entity.Passenger;
 import jakarta.persistence.*;

@@ -1,10 +1,8 @@
 package com.flight_booking.booking.dto;
 
-import com.flight_booking.flight.dto.FlightCreateResponseDto;
-import com.flight_booking.flight.dto.FlightSummaryBookingDto;
+import com.flight_booking.ticket.dto.TicketCreateResponseDto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,7 +15,7 @@ public class BookingCreateResponseDto {
     private String currency;
 
     private List<TicketCreateResponseDto> tickets;
-    private FlightSummaryBookingDto flight;
+    private Long flightId;
 
     public Long getId() {
         return id;
@@ -67,11 +65,11 @@ public class BookingCreateResponseDto {
         this.tickets = tickets;
     }
 
-    public FlightSummaryBookingDto getFlight() {
-        return flight;
+    public Long getFlightId() {
+        return flightId;
     }
 
-    public void setFlight(FlightSummaryBookingDto flight) {
-        this.flight = flight;
+    public void setFlightId(Long flightId) {
+        this.flightId = flightId;
     }
 }

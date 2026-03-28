@@ -1,8 +1,8 @@
 package com.flight_booking.mapper;
 
-import com.flight_booking.booking.dto.TicketCreateRequestDto;
-import com.flight_booking.booking.dto.TicketCreateResponseDto;
-import com.flight_booking.booking.entity.Ticket;
+import com.flight_booking.ticket.dto.TicketCreateRequestDto;
+import com.flight_booking.ticket.dto.TicketCreateResponseDto;
+import com.flight_booking.ticket.entity.Ticket;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

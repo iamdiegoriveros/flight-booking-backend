@@ -1,4 +1,4 @@
-package com.flight_booking.booking.dto;
+package com.flight_booking.ticket.dto;
 
 import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 

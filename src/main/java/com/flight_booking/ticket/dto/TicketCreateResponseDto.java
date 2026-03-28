@@ -1,7 +1,5 @@
-package com.flight_booking.booking.dto;
+package com.flight_booking.ticket.dto;
 
-import com.flight_booking.flight.dto.FlightCreateResponseDto;
-import com.flight_booking.flight.dto.FlightSummaryBookingDto;
 import com.flight_booking.passenger.dto.PassengerCreateResponseDto;
 
 public class TicketCreateResponseDto {
@@ -13,7 +11,7 @@ public class TicketCreateResponseDto {
     private String currency;
     private String status;
     private PassengerCreateResponseDto passenger;
-    private FlightSummaryBookingDto flight;
+    private Long flightId;
 
     public Long getId() {
         return id;
@@ -71,13 +69,11 @@ public class TicketCreateResponseDto {
         this.passenger = passenger;
     }
 
-    public FlightSummaryBookingDto getFlight() {
-        return flight;
+    public Long getFlightId() {
+        return flightId;
     }
 
-    public void setFlight(FlightSummaryBookingDto flight) {
-        this.flight = flight;
+    public void setFlightId(Long flightId) {
+        this.flightId = flightId;
     }
-
-
 }

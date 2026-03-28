@@ -1,6 +1,6 @@
 package com.flight_booking.passenger.entity;
 
-import com.flight_booking.booking.entity.Ticket;
+import com.flight_booking.ticket.entity.Ticket;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
