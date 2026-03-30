@@ -9,20 +9,20 @@ import java.util.Optional;
 
 public interface FlightRepository extends JpaRepository<Flight, Long> {
 
-    @Query("""
-            SELECT new com.flight_booking.flight.dto.FlightSummaryBookingDto(
-                f.id,
-                f.origin,
-                f.destination,
-                f.dateTimeDeparture,
-                f.dateTimeArrival,
-                f.status,
-                al.name
-            )
-            FROM Flight f
-            JOIN f.aircraft ac
-            JOIN ac.airline al
-            WHERE f.id = :flightId
-            """)
-    Optional<FlightSummaryBookingDto> flightSummaryByIdBooking(@Param("flightId") Long flightId);
+//    @Query("""
+//            SELECT new com.flight_booking.flight.dto.FlightSummaryBookingDto(
+//                f.id,
+//                f.origin,
+//                f.destination,
+//                f.dateTimeDeparture,
+//                f.dateTimeArrival,
+//                f.status,
+//                al.name
+//            )
+//            FROM Flight f
+//            JOIN f.aircraft ac
+//            JOIN ac.airline al
+//            WHERE f.id = :flightId
+//            """)
+//    Optional<FlightSummaryBookingDto> flightSummaryByIdBooking(@Param("flightId") Long flightId);
 }

@@ -2,8 +2,8 @@ package com.flight_booking.user.entity;
 
 import jakarta.persistence.*;
 
-import javax.annotation.processing.Generated;
-
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
@@ -48,5 +48,13 @@ public class User {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
     }
 }
