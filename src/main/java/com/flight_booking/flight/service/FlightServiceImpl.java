@@ -3,17 +3,16 @@ package com.flight_booking.flight.service;
 import com.flight_booking.aircraft.entity.Aircraft;
 import com.flight_booking.aircraft.repository.AircraftRepository;
 import com.flight_booking.exceptions.ResourceNotFoundException;
-import com.flight_booking.flight.dto.FlightCreateRequestDto;
-import com.flight_booking.flight.dto.FlightResponseDto;
-import com.flight_booking.flight.dto.FlightFareRequestDto;
-import com.flight_booking.flight.dto.FlightFareResponseDto;
+import com.flight_booking.flight.dto.*;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.entity.FlightFare;
 import com.flight_booking.flight.repository.FlightFareRepository;
 import com.flight_booking.flight.repository.FlightRepository;
+import com.flight_booking.flight.specification.FlightSpecificationBuilder;
 import com.flight_booking.mapper.FlightFareMapper;
 import com.flight_booking.mapper.FlightMapper;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,11 +65,22 @@ public class FlightServiceImpl implements FlightService{
 
         return flightCreateResponseDto;
     }
-    
+
     @Override
     public List<FlightResponseDto> getAllFlight(Pageable pageable) {
 
         return flightRepository.findAll(pageable)
+                .stream()
+                .map(flight -> flightMapper.toDto(flight))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<FlightResponseDto> getByFilters(FlightFilterDto flightFilterDto, Pageable pageable) {
+
+        Specification<Flight> specification = FlightSpecificationBuilder.build(flightFilterDto);
+
+        return flightRepository.findAll(specification, pageable)
                 .stream()
                 .map(flight -> flightMapper.toDto(flight))
                 .collect(Collectors.toList());
