@@ -5,5 +5,5 @@ import com.flight_booking.aircraft.dto.AircraftCreateResponseDto;
 
 public interface AircraftService {
 
-    public AircraftCreateResponseDto create(AircraftCreateRequestDto requestDto);
+    AircraftCreateResponseDto create(AircraftCreateRequestDto requestDto);
 }

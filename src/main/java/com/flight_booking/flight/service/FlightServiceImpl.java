@@ -4,7 +4,7 @@ import com.flight_booking.aircraft.entity.Aircraft;
 import com.flight_booking.aircraft.repository.AircraftRepository;
 import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.flight.dto.FlightCreateRequestDto;
-import com.flight_booking.flight.dto.FlightCreateResponseDto;
+import com.flight_booking.flight.dto.FlightResponseDto;
 import com.flight_booking.flight.dto.FlightFareRequestDto;
 import com.flight_booking.flight.dto.FlightFareResponseDto;
 import com.flight_booking.flight.entity.Flight;
@@ -13,6 +13,7 @@ import com.flight_booking.flight.repository.FlightFareRepository;
 import com.flight_booking.flight.repository.FlightRepository;
 import com.flight_booking.mapper.FlightFareMapper;
 import com.flight_booking.mapper.FlightMapper;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +39,7 @@ public class FlightServiceImpl implements FlightService{
 
     @Override
     @Transactional
-    public FlightCreateResponseDto create(FlightCreateRequestDto requestDto) {
+    public FlightResponseDto create(FlightCreateRequestDto requestDto) {
 
         Aircraft aircraft = aircraftRepository.findById(requestDto.getAircraftId())
                 .orElseThrow(() -> new ResourceNotFoundException("Aircraft not found with id " + requestDto.getAircraftId()));
@@ -60,9 +61,18 @@ public class FlightServiceImpl implements FlightService{
                 })
                 .toList();
 
-        FlightCreateResponseDto flightCreateResponseDto = flightMapper.toDto(flightDB);
+        FlightResponseDto flightCreateResponseDto = flightMapper.toDto(flightDB);
         flightCreateResponseDto.setFlightFare(flightFaresResponseDto);
 
         return flightCreateResponseDto;
+    }
+    
+    @Override
+    public List<FlightResponseDto> getAllFlight(Pageable pageable) {
+
+        return flightRepository.findAll(pageable)
+                .stream()
+                .map(flight -> flightMapper.toDto(flight))
+                .collect(Collectors.toList());
     }
 }

@@ -1,12 +1,11 @@
 package com.flight_booking.flight.dto;
 
 import com.flight_booking.aircraft.dto.AircraftCreateResponseDto;
-import com.flight_booking.aircraft.entity.Aircraft;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-public class FlightCreateResponseDto {
+public class FlightResponseDto {
 
     private Long id;
     private String origin;

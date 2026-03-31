@@ -1,7 +1,7 @@
 package com.flight_booking.mapper;
 
 import com.flight_booking.flight.dto.FlightCreateRequestDto;
-import com.flight_booking.flight.dto.FlightCreateResponseDto;
+import com.flight_booking.flight.dto.FlightResponseDto;
 import com.flight_booking.flight.entity.Flight;
 import org.mapstruct.Mapper;
 
@@ -9,5 +9,5 @@ import org.mapstruct.Mapper;
 public interface FlightMapper {
 
     Flight toEntity(FlightCreateRequestDto dto);
-    FlightCreateResponseDto toDto(Flight entity);
+    FlightResponseDto toDto(Flight entity);
 }
