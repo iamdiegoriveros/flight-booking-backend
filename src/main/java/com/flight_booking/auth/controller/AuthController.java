@@ -46,7 +46,7 @@ public class AuthController {
             return ResponseEntity.ok().body(new AuthResponseDto(token));
 
         } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username o password invalid!!!");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username o password invalid");
         }
     }
 

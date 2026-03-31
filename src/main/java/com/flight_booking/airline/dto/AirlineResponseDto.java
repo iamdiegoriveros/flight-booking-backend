@@ -1,6 +1,6 @@
 package com.flight_booking.airline.dto;
 
-public class AirlineCreateResponseDto {
+public class AirlineResponseDto {
 
     private Long id;
 

@@ -1,6 +1,6 @@
 package com.flight_booking.aircraft.dto;
 
-import com.flight_booking.airline.dto.AirlineCreateResponseDto;
+import com.flight_booking.airline.dto.AirlineResponseDto;
 
 public class AircraftCreateResponseDto {
 
@@ -8,7 +8,7 @@ public class AircraftCreateResponseDto {
     private String model;
     private int capacity;
     private String status;
-    private AirlineCreateResponseDto airline;
+    private AirlineResponseDto airline;
 
     public String getModel() {
         return model;
@@ -42,11 +42,11 @@ public class AircraftCreateResponseDto {
         return id;
     }
 
-    public AirlineCreateResponseDto getAirline() {
+    public AirlineResponseDto getAirline() {
         return airline;
     }
 
-    public void setAirline(AirlineCreateResponseDto airline) {
+    public void setAirline(AirlineResponseDto airline) {
         this.airline = airline;
     }
 }

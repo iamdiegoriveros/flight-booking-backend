@@ -1,9 +1,17 @@
 package com.flight_booking.airline.service;
 
-import com.flight_booking.airline.dto.AirlineCreateResponseDto;
+import com.flight_booking.airline.dto.AirlineResponseDto;
 import com.flight_booking.airline.dto.AirlineCreateResquestDto;
+import com.flight_booking.airline.entity.Airline;
+import com.flight_booking.exceptions.ResourceNotFoundException;
+
+import java.util.List;
 
 public interface AirlineService {
 
-    public AirlineCreateResponseDto create(AirlineCreateResquestDto requestDto);
+    AirlineResponseDto create(AirlineCreateResquestDto requestDto);
+
+    List<AirlineResponseDto> getAllAirline();
+
+    void deleteAirlineById(Long id);
 }
