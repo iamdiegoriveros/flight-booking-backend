@@ -1,6 +1,7 @@
 package com.flight_booking.flight.entity;
 
 import com.flight_booking.aircraft.entity.Aircraft;
+import com.flight_booking.booking.exceptions.NoSeatAvailableException;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -17,6 +18,7 @@ public class Flight {
 
     private String origin;
     private String destination;
+    private int availableSeats;
     private LocalDateTime dateTimeDeparture;
     private LocalDateTime dateTimeArrival;
     private String status;
@@ -96,6 +98,14 @@ public class Flight {
         this.aircraft = aircraft;
     }
 
+    public int getAvailableSeats() {
+        return availableSeats;
+    }
+
+    public void setAvailableSeats(int availableSeats) {
+        this.availableSeats = availableSeats;
+    }
+
     public String formatterDateTimeDeparture() {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
@@ -108,8 +118,17 @@ public class Flight {
         return this.dateTimeArrival.format(format);
     }
 
-    public boolean seatAvailable() {
-        return this.aircraft.getCapacity() > 0;
+    public boolean hasAvailableSeats(int ticketCount) {
+        return this.availableSeats >= ticketCount;
+    }
+
+    public void reserveSeats(int ticketCount) {
+        if (hasAvailableSeats(ticketCount)) {
+            this.availableSeats = availableSeats - ticketCount;
+        } else {
+            throw new NoSeatAvailableException("Not enough available seats. FlightId %d has %d seats remaining"
+                    .formatted(this.id, this.availableSeats));
+        }
     }
 }
 

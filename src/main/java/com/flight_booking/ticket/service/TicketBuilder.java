@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.*;
 
-@Service
 public class TicketBuilder {
 
     public TicketBuildResult build(
@@ -33,7 +32,7 @@ public class TicketBuilder {
             totalPrice = totalPrice.add(flightFare.getBasePrice());
 
             Ticket ticket = buildTicketEntity(flightFare, flight);
-            ticket.setPassenger(passengersInDbMap.get(ticketDto.getPassengerCreateRequestDto().getDni()));
+            ticket.setPassenger(passengersInDbMap.get(ticketDto.getPassengers().getDni()));
 
             allTickets.add(ticket);
         }

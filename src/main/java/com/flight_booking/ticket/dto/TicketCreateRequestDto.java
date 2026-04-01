@@ -5,7 +5,7 @@ import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 public class TicketCreateRequestDto {
 
     private String travelClass;
-    private PassengerCreateRequestDto passengerCreateRequestDto;
+    private PassengerCreateRequestDto passengers;
 
     public String getTravelClass() {
         return travelClass;
@@ -15,11 +15,11 @@ public class TicketCreateRequestDto {
         this.travelClass = travelClass;
     }
 
-    public PassengerCreateRequestDto getPassengerCreateRequestDto() {
-        return passengerCreateRequestDto;
+    public PassengerCreateRequestDto getPassengers() {
+        return passengers;
     }
 
-    public void setPassengerCreateRequestDto(PassengerCreateRequestDto passengerCreateRequestDto) {
-        this.passengerCreateRequestDto = passengerCreateRequestDto;
+    public void setPassengers(PassengerCreateRequestDto passengers) {
+        this.passengers = passengers;
     }
 }

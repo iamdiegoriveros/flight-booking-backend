@@ -47,6 +47,7 @@ public class FlightServiceImpl implements FlightService{
         Flight flight = flightMapper.toEntity(requestDto);
 
         flight.setAircraft(aircraft);
+        flight.setAvailableSeats(aircraft.getCapacity());
 
         Flight flightDB = flightRepository.save(flight);
 

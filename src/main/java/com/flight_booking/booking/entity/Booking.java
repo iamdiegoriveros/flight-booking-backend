@@ -1,6 +1,8 @@
 package com.flight_booking.booking.entity;
 
+import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.ticket.entity.Ticket;
+import com.flight_booking.user.entity.User;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -26,13 +28,13 @@ public class Booking {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ticket> tickets;
 
-    //    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "flight_id")
-//    private Flight flight;
+    @ManyToOne
+    @JoinColumn(name = "flight_id")
+    private Flight flight;
 
 
     public Booking() {
@@ -98,6 +100,22 @@ public class Booking {
 
     public void setTickets(List<Ticket> tickets) {
         this.tickets = tickets;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public Flight getFlight() {
+        return flight;
+    }
+
+    public void setFlight(Flight flight) {
+        this.flight = flight;
     }
 
     public void addTickets(List<Ticket> ticketsList) {
