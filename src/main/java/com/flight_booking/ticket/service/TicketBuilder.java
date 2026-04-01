@@ -7,11 +7,13 @@ import com.flight_booking.passenger.entity.Passenger;
 import com.flight_booking.ticket.dto.TicketBuildResult;
 import com.flight_booking.ticket.dto.TicketCreateRequestDto;
 import com.flight_booking.ticket.entity.Ticket;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;
 
+@Component
 public class TicketBuilder {
 
     public TicketBuildResult build(

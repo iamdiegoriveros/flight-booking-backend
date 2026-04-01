@@ -12,7 +12,6 @@ import com.flight_booking.ticket.dto.TicketCreateRequestDto;
 import com.flight_booking.ticket.dto.TicketCreateResponseDto;
 import com.flight_booking.ticket.entity.Ticket;
 import com.flight_booking.booking.repository.BookingRepository;
-import com.flight_booking.exceptions.BadRequestException;
 import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.entity.FlightFare;
@@ -24,6 +23,7 @@ import com.flight_booking.passenger.entity.Passenger;
 import com.flight_booking.ticket.service.TicketBuilder;
 import com.flight_booking.user.entity.User;
 import com.flight_booking.user.repository.UserRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -65,9 +65,21 @@ public class BookingServiceImpl implements BookingService{
     }
 
     @Override
+    public List<BookingResponseDto> getMyBookings(Authentication authentication, Pageable pageable) {
+
+        String usernameUser = ((UserDetails) authentication.getPrincipal()).getUsername();
+        User user = userRepository.findByUsername(usernameUser)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + usernameUser));
+
+        return bookingRepository.findBookingByUser(user, pageable).stream()
+                .map(booking -> bookingMapper.toDto(booking))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     @Transactional
-    public BookingCreateResponseDto create(BookingCreateRequestDto requestDto,
-                                           Authentication authentication) {
+    public BookingResponseDto create(BookingCreateRequestDto requestDto,
+                                     Authentication authentication) {
 
         String usernameUser = ((UserDetails) authentication.getPrincipal()).getUsername();
         User user = userRepository.findByUsername(usernameUser)
@@ -143,7 +155,7 @@ public class BookingServiceImpl implements BookingService{
         return bookingRepository.save(booking);
     }
 
-    private BookingCreateResponseDto buildBookingResponse(
+    private BookingResponseDto buildBookingResponse(
             Booking bookingDB,
             List<Ticket> ticketsDB,
             Long flightId) {
@@ -157,7 +169,7 @@ public class BookingServiceImpl implements BookingService{
         }
 
         // create booking dto
-        BookingCreateResponseDto bookingCreateResponseDto = new BookingCreateResponseDto();
+        BookingResponseDto bookingCreateResponseDto = new BookingResponseDto();
         bookingCreateResponseDto.setId(bookingDB.getId());
         bookingCreateResponseDto.setCreatedAt(bookingDB.getCreatedAt());
         bookingCreateResponseDto.setTotalPrice(bookingDB.getTotalPrice());
