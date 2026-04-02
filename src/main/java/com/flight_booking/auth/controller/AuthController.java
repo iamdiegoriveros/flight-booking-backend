@@ -2,6 +2,7 @@ package com.flight_booking.auth.controller;
 
 import com.flight_booking.auth.dto.AuthRequestDto;
 import com.flight_booking.auth.dto.AuthResponseDto;
+import com.flight_booking.auth.service.AuthService;
 import com.flight_booking.security.jwt.JwtService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,37 +18,17 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
+    private final AuthService authService;
 
-    private final JwtService jwtService;
-
-    public AuthController(AuthenticationManager authenticationManager, JwtService jwtService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtService = jwtService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequestDto authRequestDto) {
 
-        String token = null;
-
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequestDto.getUsername(), authRequestDto.getPassword())
-            );
-
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-
-            if (authentication != null) {
-                token = jwtService.generateToken(userDetails);
-            }
-
-            return ResponseEntity.ok().body(new AuthResponseDto(token));
-
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Username o password invalid");
-        }
+        return ResponseEntity.ok().body(authService.login(authRequestDto));
     }
 
 }
