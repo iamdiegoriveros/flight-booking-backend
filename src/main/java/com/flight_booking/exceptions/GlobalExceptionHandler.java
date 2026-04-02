@@ -14,34 +14,38 @@ import java.util.List;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    private final HttpServletRequest request;
+
+    public GlobalExceptionHandler(HttpServletRequest request) {
+        this.request = request;
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlerResourceNotFound(ResourceNotFoundException exception, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponse> handlerResourceNotFound(ResourceNotFoundException exception) {
+
+        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handlerBadRequest(BadCredentialsException exception) {
+
+        return buildResponse(HttpStatus.UNAUTHORIZED, exception.getMessage());
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message) {
+
+        return buildResponse(status, message, null);
+    }
+
+    private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String message, List<String> errors) {
 
         ErrorResponse errorResponse = new ErrorResponse();
-
-        errorResponse.setStatus(HttpStatus.NOT_FOUND.value());
-        errorResponse.setError(HttpStatus.NOT_FOUND.getReasonPhrase());
-        errorResponse.setMessage(exception.getMessage());
+        errorResponse.setStatus(status.value());
+        errorResponse.setError(status.getReasonPhrase());
+        errorResponse.setMessage(message);
         errorResponse.setPath(request.getRequestURI());
         errorResponse.setTimestamp(LocalDateTime.now());
 
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+        return ResponseEntity.status(status).body(errorResponse);
     }
-
-    @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<ErrorResponse> handlerBadRequest(BadRequestException exception, HttpServletRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse();
-
-        errorResponse.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponse.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorResponse.setMessage(exception.getMessage());
-        errorResponse.setPath(request.getRequestURI());
-        errorResponse.setTimestamp(LocalDateTime.now());
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
-
 }
