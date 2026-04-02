@@ -6,7 +6,7 @@ import com.flight_booking.aircraft.entity.Aircraft;
 import com.flight_booking.aircraft.repository.AircraftRepository;
 import com.flight_booking.airline.entity.Airline;
 import com.flight_booking.airline.repository.AirlineRepository;
-import com.flight_booking.exceptions.airline.AirlineNotFoundException;
+import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.mapper.AircraftMapper;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,7 @@ public class AircraftServiceImpl implements AircraftService{
     public AircraftCreateResponseDto create(AircraftCreateRequestDto requestDto) {
 
         Airline airline = airlineRepository.findById(requestDto.getAirlineId())
-                .orElseThrow(() -> new AirlineNotFoundException("Airline not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Airline not found"));
 
         Aircraft aircraft = aircraftMapper.toEntity(requestDto);
 

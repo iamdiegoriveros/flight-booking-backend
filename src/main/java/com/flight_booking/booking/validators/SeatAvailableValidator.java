@@ -1,6 +1,7 @@
 package com.flight_booking.booking.validators;
 
 import com.flight_booking.booking.exceptions.NoSeatAvailableException;
+import com.flight_booking.exceptions.BadRequestException;
 import com.flight_booking.flight.entity.Flight;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ public class SeatAvailableValidator implements BookingValidator{
         int ticketCount = context.getTickets().size();
 
         if (!flight.hasAvailableSeats(ticketCount)) {
-            throw new NoSeatAvailableException("Not enough available seats. FlightId %d has %d seats remaining"
+            throw new BadRequestException("Not enough available seats. FlightId %d has %d seats remaining"
                     .formatted(flight.getId(), flight.getAvailableSeats()));
         }
     }

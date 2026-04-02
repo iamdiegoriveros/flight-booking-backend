@@ -1,8 +1,7 @@
 package com.flight_booking.booking.validators;
 
-import com.flight_booking.booking.exceptions.NoUniqueDniException;
+import com.flight_booking.exceptions.BadRequestException;
 import com.flight_booking.ticket.dto.TicketCreateRequestDto;
-import com.flight_booking.ticket.entity.Ticket;
 import org.springframework.stereotype.Component;
 
 import java.util.HashSet;
@@ -20,7 +19,7 @@ public class UniqueDniValidator implements BookingValidator{
 
         for (TicketCreateRequestDto ticket: tickets) {
             if (!dnis.add(ticket.getPassengers().getDni())) {
-                throw new NoUniqueDniException("Duplicated DNI detected");
+                throw new BadRequestException("Duplicated DNI detected");
             }
         }
     }

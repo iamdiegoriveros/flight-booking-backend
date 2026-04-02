@@ -1,5 +1,6 @@
 package com.flight_booking.ticket.service;
 
+import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.repository.FlightRepository;
 import com.flight_booking.mapper.TicketMapper;
@@ -31,10 +32,11 @@ public class TicketServiceImpl implements TicketService{
     @Override
     public List<TicketResponseDto> getTicketsByFlightId(Long flightId) {
 
-        Flight flight = flightRepository.findById(flightId)
-                .orElseThrow(() -> new RuntimeException("Flight not found with id: " + flightId));
+        if (!flightRepository.existsById(flightId)) {
+            throw new ResourceNotFoundException("Flight not found with id: " + flightId);
+        }
 
-        List<Ticket> tickets = ticketRepository.findByFlight(flight);
+        List<Ticket> tickets = ticketRepository.findByFlightId(flightId);
 
         return tickets.stream()
                 .map(ticket -> ticketMapper.toDto(ticket))

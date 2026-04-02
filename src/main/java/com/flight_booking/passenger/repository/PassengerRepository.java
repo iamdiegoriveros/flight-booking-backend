@@ -17,6 +17,4 @@ public interface PassengerRepository extends JpaRepository<Passenger, Long> {
     Passenger getReferenceByDni(String dni);
 
     List<Passenger> findByDniIn(Collection<String> dnis);
-
-//    List<Passenger> findByFlight(Long id);
 }

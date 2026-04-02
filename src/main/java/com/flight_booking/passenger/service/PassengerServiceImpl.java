@@ -45,10 +45,4 @@ public class PassengerServiceImpl implements PassengerService{
                 .collect(Collectors.toMap(Passenger::getDni, passenger -> passenger));
     }
 
-//    @Override
-//    public List<PassengerResponseDto> getPassengersByFlightId(Long flightId) {
-//        return passengerRepository.findByFlight(flightId).stream()
-//                .map(passenger -> passengerMapper.toDto(passenger))
-//                .collect(Collectors.toList());
-//    }
 }
