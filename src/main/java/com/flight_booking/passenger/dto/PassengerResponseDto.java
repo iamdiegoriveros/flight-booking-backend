@@ -1,6 +1,6 @@
 package com.flight_booking.passenger.dto;
 
-public class PassengerCreateResponseDto {
+public class PassengerResponseDto {
 
     private Long Id;
     private String firstName;

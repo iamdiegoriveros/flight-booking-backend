@@ -2,7 +2,7 @@ package com.flight_booking.passenger.service;
 
 import com.flight_booking.mapper.PassengerMapper;
 import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
-import com.flight_booking.passenger.dto.PassengerCreateResponseDto;
+import com.flight_booking.passenger.dto.PassengerResponseDto;
 import com.flight_booking.passenger.entity.Passenger;
 import com.flight_booking.passenger.repository.PassengerRepository;
 import org.springframework.stereotype.Service;
@@ -11,18 +11,18 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class PassengerServiceImp implements PassengerService{
+public class PassengerServiceImpl implements PassengerService{
 
     private final PassengerRepository passengerRepository;
     private final PassengerMapper passengerMapper;
 
-    public PassengerServiceImp(PassengerRepository passengerRepository, PassengerMapper passengerMapper) {
+    public PassengerServiceImpl(PassengerRepository passengerRepository, PassengerMapper passengerMapper) {
         this.passengerRepository = passengerRepository;
         this.passengerMapper = passengerMapper;
     }
 
     @Override
-    public PassengerCreateResponseDto save(PassengerCreateRequestDto responseDto) {
+    public PassengerResponseDto save(PassengerCreateRequestDto responseDto) {
         Passenger passenger = passengerMapper.toEntity(responseDto);
         return passengerMapper.toDto(passengerRepository.save(passenger));
     }
@@ -45,5 +45,10 @@ public class PassengerServiceImp implements PassengerService{
                 .collect(Collectors.toMap(Passenger::getDni, passenger -> passenger));
     }
 
-
+//    @Override
+//    public List<PassengerResponseDto> getPassengersByFlightId(Long flightId) {
+//        return passengerRepository.findByFlight(flightId).stream()
+//                .map(passenger -> passengerMapper.toDto(passenger))
+//                .collect(Collectors.toList());
+//    }
 }

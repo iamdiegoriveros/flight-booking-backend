@@ -1,14 +1,12 @@
-package com.flight_booking.ticket.service;
+package com.flight_booking.ticket.builder;
 
 import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.entity.FlightFare;
 import com.flight_booking.passenger.entity.Passenger;
-import com.flight_booking.ticket.dto.TicketBuildResult;
 import com.flight_booking.ticket.dto.TicketCreateRequestDto;
 import com.flight_booking.ticket.entity.Ticket;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.*;

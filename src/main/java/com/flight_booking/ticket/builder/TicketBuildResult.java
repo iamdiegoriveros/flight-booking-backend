@@ -1,13 +1,9 @@
-package com.flight_booking.ticket.dto;
+package com.flight_booking.ticket.builder;
 
-import com.flight_booking.passenger.entity.Passenger;
 import com.flight_booking.ticket.entity.Ticket;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class TicketBuildResult {
 

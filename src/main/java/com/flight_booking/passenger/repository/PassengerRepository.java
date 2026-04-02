@@ -11,7 +11,12 @@ import java.util.Set;
 public interface PassengerRepository extends JpaRepository<Passenger, Long> {
 
     Boolean existsByDni(String dni);
+
     Optional<Passenger> findByDni(String dni);
+
     Passenger getReferenceByDni(String dni);
+
     List<Passenger> findByDniIn(Collection<String> dnis);
+
+//    List<Passenger> findByFlight(Long id);
 }

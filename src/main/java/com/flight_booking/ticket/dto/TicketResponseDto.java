@@ -1,8 +1,8 @@
 package com.flight_booking.ticket.dto;
 
-import com.flight_booking.passenger.dto.PassengerCreateResponseDto;
+import com.flight_booking.passenger.dto.PassengerResponseDto;
 
-public class TicketCreateResponseDto {
+public class TicketResponseDto {
 
     private Long id;
     private String travelClass;
@@ -10,7 +10,7 @@ public class TicketCreateResponseDto {
     private float price;
     private String currency;
     private String status;
-    private PassengerCreateResponseDto passenger;
+    private PassengerResponseDto passenger;
     private Long flightId;
 
     public Long getId() {
@@ -61,11 +61,11 @@ public class TicketCreateResponseDto {
         this.status = status;
     }
 
-    public PassengerCreateResponseDto getPassenger() {
+    public PassengerResponseDto getPassenger() {
         return passenger;
     }
 
-    public void setPassenger(PassengerCreateResponseDto passenger) {
+    public void setPassenger(PassengerResponseDto passenger) {
         this.passenger = passenger;
     }
 

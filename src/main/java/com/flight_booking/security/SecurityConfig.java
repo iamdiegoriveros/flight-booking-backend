@@ -33,6 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/flight/**").authenticated()
                         .requestMatchers("/api/airline/**").hasRole("ADMIN")
                         .requestMatchers("/api/aircraft/**").hasRole("ADMIN")
+                        .requestMatchers("/api/ticket/**").hasRole("ADMIN")
                         .requestMatchers("/api/booking/**").hasRole("USER")
                         .requestMatchers("/api/auth/**").permitAll()
                 )

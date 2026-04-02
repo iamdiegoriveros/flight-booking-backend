@@ -7,9 +7,9 @@ import com.flight_booking.booking.validators.BookingValidator;
 import com.flight_booking.flight.service.FlightFareService;
 import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 import com.flight_booking.passenger.service.PassengerService;
-import com.flight_booking.ticket.dto.TicketBuildResult;
+import com.flight_booking.ticket.builder.TicketBuildResult;
 import com.flight_booking.ticket.dto.TicketCreateRequestDto;
-import com.flight_booking.ticket.dto.TicketCreateResponseDto;
+import com.flight_booking.ticket.dto.TicketResponseDto;
 import com.flight_booking.ticket.entity.Ticket;
 import com.flight_booking.booking.repository.BookingRepository;
 import com.flight_booking.exceptions.ResourceNotFoundException;
@@ -20,7 +20,7 @@ import com.flight_booking.mapper.BookingMapper;
 import com.flight_booking.mapper.FlightMapper;
 import com.flight_booking.mapper.TicketMapper;
 import com.flight_booking.passenger.entity.Passenger;
-import com.flight_booking.ticket.service.TicketBuilder;
+import com.flight_booking.ticket.builder.TicketBuilder;
 import com.flight_booking.user.entity.User;
 import com.flight_booking.user.repository.UserRepository;
 import org.springframework.data.domain.Pageable;
@@ -160,10 +160,10 @@ public class BookingServiceImpl implements BookingService{
             List<Ticket> ticketsDB,
             Long flightId) {
 
-        List<TicketCreateResponseDto> ticketsCreateResponseDto = new ArrayList<>();
+        List<TicketResponseDto> ticketsCreateResponseDto = new ArrayList<>();
 
         for (Ticket ticket:ticketsDB) {
-            TicketCreateResponseDto ticketDto = ticketMapper.toDto(ticket);
+            TicketResponseDto ticketDto = ticketMapper.toDto(ticket);
             ticketDto.setFlightId(flightId);
             ticketsCreateResponseDto.add(ticketDto);
         }
