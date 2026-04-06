@@ -42,7 +42,7 @@ public class AirlineServiceImpl implements AirlineService{
     public void deleteAirlineById(Long id) {
         try{
             airlineRepository.deleteById(id);
-        } catch (Exception e) {
+        } catch (EmptyResultDataAccessException e) {
             throw new ResourceNotFoundException("Airline not found with id " + id);
         }
     }

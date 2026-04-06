@@ -5,6 +5,14 @@ public class AirlineCreateResquestDto {
     private String name;
     private String code;
 
+    public AirlineCreateResquestDto() {
+    }
+
+    public AirlineCreateResquestDto(String code, String name) {
+        this.code = code;
+        this.name = name;
+    }
+
     public String getName() {
         return name;
     }

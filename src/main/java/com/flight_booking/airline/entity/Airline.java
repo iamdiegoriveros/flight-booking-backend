@@ -17,6 +17,12 @@ public class Airline {
     public Airline() {
     }
 
+    public Airline(Long id, String code, String name) {
+        this.id = id;
+        this.code = code;
+        this.name = name;
+    }
+
     public Airline(String name, String code) {
         this.name = name;
         this.code = code;
