@@ -5,6 +5,7 @@ import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 import com.flight_booking.passenger.dto.PassengerResponseDto;
 import com.flight_booking.passenger.entity.Passenger;
 import com.flight_booking.passenger.repository.PassengerRepository;
+import com.flight_booking.ticket.dto.TicketCreateRequestDto;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -45,4 +46,35 @@ public class PassengerServiceImpl implements PassengerService{
                 .collect(Collectors.toMap(Passenger::getDni, passenger -> passenger));
     }
 
+    @Override
+    public Map<String, Passenger> saveNewPassenger(List<PassengerCreateRequestDto> passengerDto) {
+
+        Set<String> dnis = passengerDto.stream()
+                .map(passenger -> passenger.getDni())
+                .collect(Collectors.toSet());
+
+        Map<String,Passenger> passengersInDB = this.getExistingPassengerByDni(dnis);
+
+        List<Passenger> newPassengers = buildNewPassengersEntity(passengerDto, passengersInDB);
+        Map<String, Passenger> savedNewPassenger = this.saveAllMap(newPassengers);
+
+        Map<String, Passenger> allPassengerInDB = new HashMap<>(passengersInDB);
+        allPassengerInDB.putAll(savedNewPassenger);
+
+        return allPassengerInDB;
+    }
+
+
+    private List<Passenger> buildNewPassengersEntity(List<PassengerCreateRequestDto> passengersDto, Map<String, Passenger> passengerInDbMap){
+
+        List<Passenger> passengers = new ArrayList<>();
+
+        for (PassengerCreateRequestDto passengerDto:passengersDto) {
+            if (!passengerInDbMap.containsKey(passengerDto.getDni())) {
+                Passenger passenger = passengerMapper.toEntity(passengerDto);
+                passengers.add(passenger);
+            }
+        }
+        return passengers;
+    }
 }

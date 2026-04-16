@@ -6,6 +6,7 @@ import com.flight_booking.exceptions.ResourceNotFoundException;
 import com.flight_booking.flight.dto.*;
 import com.flight_booking.flight.entity.Flight;
 import com.flight_booking.flight.entity.FlightFare;
+import com.flight_booking.flight.exception.NoAvailableSeatException;
 import com.flight_booking.flight.repository.FlightFareRepository;
 import com.flight_booking.flight.repository.FlightRepository;
 import com.flight_booking.flight.specification.FlightSpecificationBuilder;
@@ -85,5 +86,18 @@ public class FlightServiceImpl implements FlightService{
                 .stream()
                 .map(flight -> flightMapper.toDto(flight))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void reserveSeat(Long flightId, int seatCount) {
+        int updatedSeat = flightRepository.reserveSeat(flightId, seatCount);
+
+        if (updatedSeat == 0) throw new NoAvailableSeatException("No available seat by flight with id: " + flightId);
+    }
+
+    @Override
+    public Flight getFlightEntity(Long flightId) {
+        return flightRepository.findById(flightId)
+                .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id: " + flightId));
     }
 }

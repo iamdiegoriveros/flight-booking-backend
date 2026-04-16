@@ -10,9 +10,13 @@ import java.util.List;
 
 public interface FlightService{
 
+    Flight getFlightEntity(Long flightId);
+
     FlightResponseDto create(FlightCreateRequestDto requestDto);
 
     List<FlightResponseDto> getAllFlight(Pageable pageable);
 
     List<FlightResponseDto> getByFilters(FlightFilterDto flightFilterDto, Pageable pageable);
+
+    void reserveSeat(Long flightId, int seatCount);
 }

@@ -19,4 +19,6 @@ public interface PassengerService {
     Map<String, Passenger> saveAllMap(Collection<Passenger> passengers);
 
 //    List<PassengerResponseDto> getPassengersByFlightId(Long flightId);
+
+    Map<String, Passenger> saveNewPassenger(List<PassengerCreateRequestDto> passengerDto);
 }

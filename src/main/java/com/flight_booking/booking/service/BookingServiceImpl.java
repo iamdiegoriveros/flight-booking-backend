@@ -5,6 +5,7 @@ import com.flight_booking.booking.entity.Booking;
 import com.flight_booking.booking.validators.BookingValidationContext;
 import com.flight_booking.booking.validators.BookingValidator;
 import com.flight_booking.flight.service.FlightFareService;
+import com.flight_booking.flight.service.FlightService;
 import com.flight_booking.passenger.dto.PassengerCreateRequestDto;
 import com.flight_booking.passenger.service.PassengerService;
 import com.flight_booking.ticket.builder.TicketBuildResult;
@@ -38,11 +39,11 @@ public class BookingServiceImpl implements BookingService{
 
     private final PassengerService passengerService;
     private final FlightFareService flightFareService;
+    private final FlightService flightService;
 
     private final TicketBuilder ticketBuilder;
 
     private final BookingRepository bookingRepository;
-    private final FlightRepository flightRepository;
     private final UserRepository userRepository;
 
     private final List<BookingValidator> bookingValidators;
@@ -51,12 +52,12 @@ public class BookingServiceImpl implements BookingService{
     private final TicketMapper ticketMapper;
     private final BookingMapper bookingMapper;
 
-    public BookingServiceImpl(PassengerService passengerService, FlightFareService flightFareService, TicketBuilder ticketBuilder, BookingRepository bookingRepository, FlightRepository flightRepository, UserRepository userRepository, List<BookingValidator> bookingValidators, FlightMapper flightMapper, TicketMapper ticketMapper, BookingMapper bookingMapper) {
+    public BookingServiceImpl(PassengerService passengerService, FlightFareService flightFareService, FlightService flightService, TicketBuilder ticketBuilder, BookingRepository bookingRepository, UserRepository userRepository, List<BookingValidator> bookingValidators, FlightMapper flightMapper, TicketMapper ticketMapper, BookingMapper bookingMapper) {
         this.passengerService = passengerService;
         this.flightFareService = flightFareService;
+        this.flightService = flightService;
         this.ticketBuilder = ticketBuilder;
         this.bookingRepository = bookingRepository;
-        this.flightRepository = flightRepository;
         this.userRepository = userRepository;
         this.bookingValidators = bookingValidators;
         this.flightMapper = flightMapper;
@@ -84,65 +85,29 @@ public class BookingServiceImpl implements BookingService{
         String usernameUser = ((UserDetails) authentication.getPrincipal()).getUsername();
         User user = userRepository.findByUsername(usernameUser)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + usernameUser));
-
-        // get flight
-        Flight flight = flightRepository.findById(requestDto.getFlightId())
-                .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id " + requestDto.getFlightId()));
+        
+        Flight flight = flightService.getFlightEntity(requestDto.getFlightId());
 
         BookingValidationContext context = new BookingValidationContext(flight, requestDto.getTickets());
         bookingValidators.forEach(validator -> validator.validate(context));
 
-        // load fares
         Map<String, FlightFare> fareMap = flightFareService.getFlightFareMap(requestDto.getFlightId());
 
-        // get dnis existentes
-        Set<String> dnis = requestDto.getTickets().stream()
-                .map(ticket -> ticket.getPassengers().getDni())
-                .collect(Collectors.toSet());
-        Map<String,Passenger> passengersInDB = passengerService.getExistingPassengerByDni(dnis);
+        List<PassengerCreateRequestDto> passengersDto = requestDto.getTickets().stream()
+                .map(ticket -> ticket.getPassengers())
+                .collect(Collectors.toList());
+        Map<String, Passenger> savedPassengers = passengerService.saveNewPassenger(passengersDto);
 
-        List<Passenger> newPassengers = buildNewPassengersEntity(requestDto.getTickets(), passengersInDB);
-        Map<String, Passenger> savedNewPassenger = passengerService.saveAllMap(newPassengers);
+        TicketBuildResult ticketBuildResult =  ticketBuilder.build(requestDto.getTickets(),flight,fareMap,savedPassengers);
 
-        Map<String, Passenger> allPassengerInDb = new HashMap<>(passengersInDB);
-        allPassengerInDb.putAll(savedNewPassenger);
+        flightService.reserveSeat(requestDto.getFlightId(), ticketBuildResult.getAllTickets().size());
 
-        TicketBuildResult ticketBuildResult =  ticketBuilder.build(requestDto.getTickets(),flight,fareMap,allPassengerInDb);
-
-
-
-        // create booking in DataBase
         Booking bookingDB = saveBooking(flight, ticketBuildResult, user);
-
 
         return buildBookingResponse(bookingDB, bookingDB.getTickets(), flight.getId());
     }
 
-    private List<Passenger> buildNewPassengersEntity(List<TicketCreateRequestDto> ticketsDto, Map<String, Passenger> passengerInDbMap){
-
-        List<Passenger> passengers = new ArrayList<>();
-
-        for (TicketCreateRequestDto ticketDto:ticketsDto) {
-            if (!passengerInDbMap.containsKey(ticketDto.getPassengers().getDni())) {
-                Passenger passenger = buildPassengerEntity(ticketDto.getPassengers());
-                passengers.add(passenger);
-            }
-        }
-        return passengers;
-    }
-
-    private Passenger buildPassengerEntity(PassengerCreateRequestDto passengerDto) {
-        Passenger passenger = new Passenger();
-        passenger.setFirstName(passengerDto.getFirstName());
-        passenger.setLastName(passengerDto.getLastName());
-        passenger.setDni(passengerDto.getDni());
-
-        return passenger;
-    }
-
     private Booking saveBooking(Flight flight,TicketBuildResult ticketBuildResult, User user) {
-
-        flight.reserveSeats(ticketBuildResult.getAllTickets().size());
 
         Booking booking = new Booking();
         booking.setCurrency("USD");

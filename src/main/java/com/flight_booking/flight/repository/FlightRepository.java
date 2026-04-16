@@ -4,6 +4,7 @@ import com.flight_booking.flight.entity.Flight;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,6 +16,25 @@ public interface FlightRepository extends JpaRepository<Flight, Long>,
 
     List<Flight> findByOriginAndDestination(String origin, String destination, Pageable pageable);
 
+    @Modifying
+    @Query("""
+            UPDATE Flight f 
+            SET f.availableSeats = f.availableSeats - :seatCount
+            WHERE f.id = :flightId AND f.availableSeats >= :seatCount
+            """)
+    int reserveSeat(Long flightId, int seatCount);
+
+    // version con OPTIMISTIC locking
+//    @Modifying
+//    @Query("""
+//    UPDATE Flight f
+//    SET f.availableSeats = f.availableSeats - :seatCount,
+//        f.version = f.version + 1
+//    WHERE f.id = :flightId
+//    AND f.version = :version
+//    AND f.availableSeats >= :seatCount
+//""")
+//    int reserveSeat(Long flightId, int seatCount, Long version);
 //    @Query("""
 //            SELECT new com.flight_booking.flight.dto.FlightSummaryBookingDto(
 //                f.id,

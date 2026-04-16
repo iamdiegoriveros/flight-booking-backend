@@ -32,7 +32,13 @@ public class TicketBuilder {
             totalPrice = totalPrice.add(flightFare.getBasePrice());
 
             Ticket ticket = buildTicketEntity(flightFare, flight);
-            ticket.setPassenger(passengersInDbMap.get(ticketDto.getPassengers().getDni()));
+
+            Passenger passenger = Optional.ofNullable(passengersInDbMap.get(ticketDto.getPassengers().getDni())
+            ).orElseThrow(() -> new ResourceNotFoundException(
+                    "Passenger not found for DNI: " + ticketDto.getPassengers().getDni()
+            ));
+
+            ticket.setPassenger(passenger);
 
             allTickets.add(ticket);
         }
