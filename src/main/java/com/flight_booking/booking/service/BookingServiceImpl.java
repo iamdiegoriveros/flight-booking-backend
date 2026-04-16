@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService{
         String usernameUser = ((UserDetails) authentication.getPrincipal()).getUsername();
         User user = userRepository.findByUsername(usernameUser)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + usernameUser));
-        
+
         Flight flight = flightService.getFlightEntity(requestDto.getFlightId());
 
         BookingValidationContext context = new BookingValidationContext(flight, requestDto.getTickets());
